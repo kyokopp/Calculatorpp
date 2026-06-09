@@ -1,0 +1,82 @@
+.root {
+    -fx-font-family: "Segoe UI Variable Display", "Segoe UI", sans-serif;
+    -fx-background-color: transparent;
+}
+
+.window-root {
+    -fx-background-color: transparent;
+}
+
+.calculator-shell {
+    -fx-background-color: rgba(28, 28, 30, 0.85);
+    -fx-background-radius: 12;
+    -fx-border-color: rgba(255, 255, 255, 0.16);
+    -fx-border-radius: 12;
+    -fx-border-width: 1;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.38), 24, 0.22, 0, 12);
+}
+
+.display-pane {
+    -fx-min-height: 120;
+    -fx-pref-height: 120;
+    -fx-padding: 0 2 10 0;
+    -fx-background-color: transparent;
+    -fx-cursor: move;
+}
+
+.display-label {
+    -fx-text-fill: #ffffff;
+    -fx-font-weight: 300;
+    -fx-alignment: bottom-right;
+    -fx-padding: 0 0 0 0;
+}
+
+.keypad {
+    -fx-hgap: 12;
+    -fx-vgap: 12;
+}
+
+.calc-button {
+    -fx-background-radius: 999;
+    -fx-border-radius: 999;
+    -fx-border-width: 0;
+    -fx-cursor: hand;
+    -fx-text-fill: #ffffff;
+    -fx-font-family: "Segoe UI Variable Display", "Segoe UI", sans-serif;
+    -fx-font-size: 28;
+    -fx-font-weight: 400;
+    -fx-padding: 0;
+    -fx-effect: innershadow(gaussian, rgba(255, 255, 255, 0.08), 2, 0.3, 0, 1);
+}
+
+.utility-button {
+    -fx-background-color: rgba(58, 58, 60, 0.9);
+}
+
+.number-button {
+    -fx-background-color: rgba(28, 28, 30, 0.9);
+}
+
+.operator-button {
+    -fx-background-color: #ff9f0a;
+    -fx-font-size: 32;
+}
+
+.operator-button:active {
+    -fx-background-color: #ffffff;
+    -fx-text-fill: #ff9f0a;
+}
+
+.zero-button {
+    -fx-alignment: center-left;
+    -fx-padding: 0 0 0 28;
+}
+
+.resize-handle {
+    -fx-min-width: 18;
+    -fx-min-height: 18;
+    -fx-pref-width: 18;
+    -fx-pref-height: 18;
+    -fx-background-color: transparent;
+    -fx-cursor: se-resize;
+}
