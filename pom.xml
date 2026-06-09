@@ -13,13 +13,39 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <junit.jupiter.version>5.10.3</junit.jupiter.version>
         <javafx.version>21.0.5</javafx.version>
+        <fxthemes.version>1.6.0</fxthemes.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>org.openjfx</groupId>
+            <artifactId>javafx-base</artifactId>
+            <version>${javafx.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-graphics</artifactId>
+            <version>${javafx.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
             <version>${javafx.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.pixelduke</groupId>
+            <artifactId>fxthemes</artifactId>
+            <version>${fxthemes.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.openjfx</groupId>
+                    <artifactId>javafx-controls</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.openjfx</groupId>
+                    <artifactId>javafx-graphics</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
@@ -41,7 +67,14 @@
                 <artifactId>javafx-maven-plugin</artifactId>
                 <version>0.0.8</version>
                 <configuration>
-                    <mainClass>calculatorpp.CalculatorApp</mainClass>
+                    <mainClass>calculatorpp/calculatorpp.CalculatorApp</mainClass>
+                    <options>
+                        <option>-Dprism.forceUploadingPainter=true</option>
+                        <option>--add-opens</option>
+                        <option>javafx.graphics/javafx.stage=com.pixelduke.fxthemes</option>
+                        <option>--add-exports</option>
+                        <option>javafx.graphics/com.sun.javafx.tk.quantum=com.pixelduke.fxthemes</option>
+                    </options>
                 </configuration>
             </plugin>
         </plugins>
