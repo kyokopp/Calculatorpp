@@ -4,43 +4,27 @@ import javafx.scene.text.Font;
 
 public final class FontLoader {
 
-    private static final String[] REGULAR_VARIANTS = {
-            "SF-Pro-Rounded-Regular.otf",
-            "SFProRounded-Regular.otf",
-            "SF Pro Rounded Regular.otf"
-    };
-
-    private static final String[] LIGHT_VARIANTS = {
-            "SF-Pro-Rounded-Thin.otf",
-            "SFProRounded-Thin.otf",
-            "SF Pro Rounded Thin.otf",
-            "SF-Pro-Rounded-Light.otf",
-            "SFProRounded-Light.otf",
-            "SF Pro Rounded Light.otf"
-    };
-
     private FontLoader() {
     }
 
     public static void loadFonts() {
-        Font regular = loadFirst(REGULAR_VARIANTS);
-        Font light = loadFirst(LIGHT_VARIANTS);
+        Font regular = Font.loadFont("file:///C:/Windows/Fonts/SF%20Pro%20Rounded%20Light.otf", 14);
+        Font light = Font.loadFont("file:///C:/Windows/Fonts/SF%20Pro%20Rounded%20Light.otf", 14);
+        Font bold = Font.loadFont("file:///C:/Windows/Fonts/SF%20Pro%20Rounded%20Bold.otf", 14);
 
-        if (regular == null) {
-            System.err.println("Warning: SF Pro Rounded regular font was not found. Falling back to Segoe UI Variable Display.");
-        }
-        if (light == null) {
-            System.err.println("Warning: SF Pro Rounded light font was not found. Falling back to Segoe UI Variable Display.");
-        }
+        logLoaded("regular", regular);
+        logLoaded("light", light);
+        logLoaded("bold", bold);
     }
 
-    private static Font loadFirst(String[] filenames) {
-        for (String filename : filenames) {
-            Font font = Font.loadFont("file:///C:/Windows/Fonts/" + filename.replace(" ", "%20"), 14);
-            if (font != null) {
-                return font;
-            }
+    private static void logLoaded(String variant, Font font) {
+        if (font == null) {
+            System.err.println("Warning: SF Pro Rounded " + variant + " font was not found. Falling back to Segoe UI Variable Display, then Segoe UI.");
+            return;
         }
-        return null;
+        System.out.println("Loaded: " + font.getFamily());
+        if (!"SF Pro Rounded".equals(font.getFamily())) {
+            System.err.println("Warning: expected SF Pro Rounded for " + variant + " but loaded " + font.getFamily() + ". Falling back to Segoe UI Variable Display, then Segoe UI if CSS font matching cannot use it.");
+        }
     }
 }

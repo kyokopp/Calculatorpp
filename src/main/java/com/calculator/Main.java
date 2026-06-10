@@ -2,11 +2,9 @@ package com.calculator;
 
 import javafx.application.Application;
 import javafx.scene.Cursor;
-import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -16,7 +14,8 @@ import java.util.Objects;
 public class Main extends Application {
 
     private static final double BASE_WIDTH = 336.0;
-    private static final double BASE_HEIGHT = 560.0;
+    private static final double CONTENT_HEIGHT = 560.0;
+    private static final double TITLE_BAR_HEIGHT = 36.0;
     private static final double RESIZE_BORDER = 6.0;
 
     private double dragOffsetX;
@@ -27,6 +26,7 @@ public class Main extends Application {
     private double resizeStartStageY;
     private double resizeStartWidth;
     private double resizeStartHeight;
+    private boolean manualResizing;
     private ResizeDirection activeResizeDirection = ResizeDirection.NONE;
 
     public static void main(String[] args) {
@@ -39,11 +39,7 @@ public class Main extends Application {
         FontLoader.loadFonts();
 
         CalculatorController controller = new CalculatorController();
-        Group contentGroup = new Group(controller.root());
-        Pane sceneRoot = new Pane(contentGroup);
-        sceneRoot.getStyleClass().add("scene-root");
-
-        Scene scene = new Scene(sceneRoot, BASE_WIDTH, BASE_HEIGHT);
+        Scene scene = new Scene(controller.root(), BASE_WIDTH, CONTENT_HEIGHT + TITLE_BAR_HEIGHT);
         scene.setFill(Color.TRANSPARENT);
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/styles/calculator.css")).toExternalForm());
 
@@ -60,17 +56,21 @@ public class Main extends Application {
             dragOffsetY = event.getScreenY() - stage.getY();
         });
         controller.displayPane().setOnMouseDragged(event -> {
-            stage.setX(event.getScreenX() - dragOffsetX);
-            stage.setY(event.getScreenY() - dragOffsetY);
+            if (!stage.isMaximized()) {
+                stage.setX(event.getScreenX() - dragOffsetX);
+                stage.setY(event.getScreenY() - dragOffsetY);
+            }
         });
 
-        sceneRoot.setOnMouseMoved(event -> sceneRoot.setCursor(resizeDirection(event, scene).cursor));
-        sceneRoot.setOnMousePressed(event -> beginResize(event, scene, stage));
-        sceneRoot.setOnMouseDragged(event -> resize(event, stage));
-        sceneRoot.setOnMouseReleased(event -> activeResizeDirection = ResizeDirection.NONE);
+        controller.root().setOnMouseMoved(event -> {
+            manualResizing = false;
+            activeResizeDirection = resizeDirection(event, scene);
+            controller.root().setCursor(activeResizeDirection.cursor);
+        });
+        controller.root().setOnMouseDragged(event -> resize(event, scene, stage));
 
-        stage.widthProperty().addListener((observable, oldValue, newValue) -> applyScale(stage, contentGroup));
-        stage.heightProperty().addListener((observable, oldValue, newValue) -> applyScale(stage, contentGroup));
+        stage.widthProperty().addListener((observable, oldValue, newValue) -> applyScale(stage, controller));
+        stage.heightProperty().addListener((observable, oldValue, newValue) -> applyScale(stage, controller));
 
         scene.setOnKeyPressed(event -> {
             KeyCode code = event.getCode();
@@ -113,22 +113,22 @@ public class Main extends Application {
         });
 
         stage.show();
-        applyScale(stage, contentGroup);
+        applyScale(stage, controller);
         WindowsTransparency.apply(stage, WindowsTransparency.Backdrop.ACRYLIC);
         controller.root().requestFocus();
     }
 
-    private void applyScale(Stage stage, Group contentGroup) {
-        double scale = Math.min(stage.getWidth() / BASE_WIDTH, stage.getHeight() / BASE_HEIGHT);
-        contentGroup.setScaleX(scale);
-        contentGroup.setScaleY(scale);
-        contentGroup.setLayoutX((stage.getWidth() - BASE_WIDTH * scale) / 2.0);
-        contentGroup.setLayoutY((stage.getHeight() - BASE_HEIGHT * scale) / 2.0);
+    private void applyScale(Stage stage, CalculatorController controller) {
+        double scale = Math.min(stage.getWidth() / BASE_WIDTH, (stage.getHeight() - TITLE_BAR_HEIGHT) / CONTENT_HEIGHT);
+        controller.scaleGroup().setScaleX(scale);
+        controller.scaleGroup().setScaleY(scale);
+        controller.scaleGroup().setTranslateX((stage.getWidth() - BASE_WIDTH * scale) / 2.0);
+        controller.scaleGroup().setTranslateY(Math.max(0.0, (stage.getHeight() - TITLE_BAR_HEIGHT - CONTENT_HEIGHT * scale) / 2.0));
     }
 
     private ResizeDirection resizeDirection(MouseEvent event, Scene scene) {
-        double x = event.getX();
-        double y = event.getY();
+        double x = event.getSceneX();
+        double y = event.getSceneY();
         boolean left = x <= RESIZE_BORDER;
         boolean right = x >= scene.getWidth() - RESIZE_BORDER;
         boolean top = y <= RESIZE_BORDER;
@@ -161,23 +161,23 @@ public class Main extends Application {
         return ResizeDirection.NONE;
     }
 
-    private void beginResize(MouseEvent event, Scene scene, Stage stage) {
-        activeResizeDirection = resizeDirection(event, scene);
-        if (activeResizeDirection == ResizeDirection.NONE) {
+    private void resize(MouseEvent event, Scene scene, Stage stage) {
+        if (stage.isMaximized()) {
+            manualResizing = false;
             return;
         }
-        resizeStartScreenX = event.getScreenX();
-        resizeStartScreenY = event.getScreenY();
-        resizeStartStageX = stage.getX();
-        resizeStartStageY = stage.getY();
-        resizeStartWidth = stage.getWidth();
-        resizeStartHeight = stage.getHeight();
-        event.consume();
-    }
-
-    private void resize(MouseEvent event, Stage stage) {
-        if (activeResizeDirection == ResizeDirection.NONE) {
-            return;
+        if (!manualResizing) {
+            activeResizeDirection = resizeDirection(event, scene);
+            if (activeResizeDirection == ResizeDirection.NONE) {
+                return;
+            }
+            resizeStartScreenX = event.getScreenX();
+            resizeStartScreenY = event.getScreenY();
+            resizeStartStageX = stage.getX();
+            resizeStartStageY = stage.getY();
+            resizeStartWidth = stage.getWidth();
+            resizeStartHeight = stage.getHeight();
+            manualResizing = true;
         }
 
         double deltaX = event.getScreenX() - resizeStartScreenX;

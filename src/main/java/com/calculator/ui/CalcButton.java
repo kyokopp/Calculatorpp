@@ -31,6 +31,7 @@ public class CalcButton extends Button {
             colorAdjust.setBrightness(isHover() ? 0.10 : 0.0);
             animateScale(1.0, 100);
         });
+        setOnMouseClicked(event -> event.consume());
     }
 
     public void setActive(boolean active) {

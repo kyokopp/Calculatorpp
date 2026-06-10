@@ -4,10 +4,9 @@ import com.calculator.ui.CalcButton;
 import com.calculator.ui.DisplayPane;
 import com.calculator.ui.WindowControls;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
+import javafx.scene.Group;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -18,7 +17,8 @@ public class CalculatorController {
 
     private final CalculatorEngine engine = new CalculatorEngine();
     private final DisplayPane displayPane = new DisplayPane();
-    private final StackPane root = new StackPane();
+    private final VBox root = new VBox();
+    private final Group scaleGroup;
     private final WindowControls windowControls = new WindowControls();
     private final Map<String, CalcButton> operatorButtons = new LinkedHashMap<>();
     private CalcButton clearButton;
@@ -26,25 +26,30 @@ public class CalculatorController {
     public CalculatorController() {
         root.getStyleClass().add("window-root");
         root.setFocusTraversable(true);
-        root.setPrefSize(336, 560);
-        root.setMinSize(336, 560);
-        root.setMaxSize(336, 560);
+        root.setPrefSize(336, 596);
+        root.setMinSize(336, 596);
 
-        VBox shell = new VBox(12);
-        shell.getStyleClass().add("calculator-shell");
-        shell.setPadding(new Insets(18, 18, 18, 18));
-        shell.getChildren().addAll(displayPane, keypad());
+        VBox scalableContent = new VBox(12);
+        scalableContent.getStyleClass().add("calculator-shell");
+        scalableContent.setPadding(new Insets(18, 18, 18, 18));
+        scalableContent.setPrefSize(336, 560);
+        scalableContent.setMinSize(336, 560);
+        scalableContent.setMaxSize(336, 560);
+        scalableContent.getChildren().addAll(displayPane, keypad());
         VBox.setVgrow(displayPane, Priority.NEVER);
 
-        StackPane.setAlignment(windowControls.root(), Pos.TOP_LEFT);
-        StackPane.setMargin(windowControls.root(), new Insets(16, 0, 0, 16));
+        scaleGroup = new Group(scalableContent);
 
-        root.getChildren().addAll(shell, windowControls.root());
+        root.getChildren().addAll(windowControls.root(), scaleGroup);
         refresh();
     }
 
-    public StackPane root() {
+    public VBox root() {
         return root;
+    }
+
+    public Group scaleGroup() {
+        return scaleGroup;
     }
 
     public DisplayPane displayPane() {
