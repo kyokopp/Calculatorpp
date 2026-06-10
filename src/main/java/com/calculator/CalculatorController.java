@@ -2,13 +2,14 @@ package com.calculator;
 
 import com.calculator.ui.CalcButton;
 import com.calculator.ui.DisplayPane;
+import com.calculator.ui.WindowControls;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -18,13 +19,16 @@ public class CalculatorController {
     private final CalculatorEngine engine = new CalculatorEngine();
     private final DisplayPane displayPane = new DisplayPane();
     private final StackPane root = new StackPane();
-    private final Region resizeHandle = new Region();
+    private final WindowControls windowControls = new WindowControls();
     private final Map<String, CalcButton> operatorButtons = new LinkedHashMap<>();
     private CalcButton clearButton;
 
     public CalculatorController() {
         root.getStyleClass().add("window-root");
         root.setFocusTraversable(true);
+        root.setPrefSize(336, 560);
+        root.setMinSize(336, 560);
+        root.setMaxSize(336, 560);
 
         VBox shell = new VBox(12);
         shell.getStyleClass().add("calculator-shell");
@@ -32,10 +36,10 @@ public class CalculatorController {
         shell.getChildren().addAll(displayPane, keypad());
         VBox.setVgrow(displayPane, Priority.NEVER);
 
-        resizeHandle.getStyleClass().add("resize-handle");
-        StackPane.setAlignment(resizeHandle, Pos.BOTTOM_RIGHT);
+        StackPane.setAlignment(windowControls.root(), Pos.TOP_LEFT);
+        StackPane.setMargin(windowControls.root(), new Insets(16, 0, 0, 16));
 
-        root.getChildren().addAll(shell, resizeHandle);
+        root.getChildren().addAll(shell, windowControls.root());
         refresh();
     }
 
@@ -47,8 +51,8 @@ public class CalculatorController {
         return displayPane;
     }
 
-    public Region resizeHandle() {
-        return resizeHandle;
+    public void attachStage(Stage stage) {
+        windowControls.attach(stage);
     }
 
     public void inputDigit(String digit) {

@@ -1,8 +1,12 @@
 package com.calculator;
 
 import javafx.application.Application;
+import javafx.scene.Cursor;
+import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -11,13 +15,19 @@ import java.util.Objects;
 
 public class Main extends Application {
 
-    private static final double ASPECT_RATIO = 336.0 / 560.0;
+    private static final double BASE_WIDTH = 336.0;
+    private static final double BASE_HEIGHT = 560.0;
+    private static final double RESIZE_BORDER = 6.0;
 
     private double dragOffsetX;
     private double dragOffsetY;
-    private double resizeStartX;
+    private double resizeStartScreenX;
+    private double resizeStartScreenY;
+    private double resizeStartStageX;
+    private double resizeStartStageY;
     private double resizeStartWidth;
-    private boolean resizing;
+    private double resizeStartHeight;
+    private ResizeDirection activeResizeDirection = ResizeDirection.NONE;
 
     public static void main(String[] args) {
         System.setProperty("prism.forceUploadingPainter", "true");
@@ -26,17 +36,24 @@ public class Main extends Application {
 
     @Override
     public void start(Stage stage) {
+        FontLoader.loadFonts();
+
         CalculatorController controller = new CalculatorController();
-        Scene scene = new Scene(controller.root(), 336, 560);
+        Group contentGroup = new Group(controller.root());
+        Pane sceneRoot = new Pane(contentGroup);
+        sceneRoot.getStyleClass().add("scene-root");
+
+        Scene scene = new Scene(sceneRoot, BASE_WIDTH, BASE_HEIGHT);
         scene.setFill(Color.TRANSPARENT);
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/styles/calculator.css")).toExternalForm());
 
         stage.initStyle(StageStyle.TRANSPARENT);
         stage.setTitle("Calculatorpp");
         stage.setResizable(true);
-        stage.setMinWidth(300);
-        stage.setMinHeight(500);
+        stage.setMinWidth(200);
+        stage.setMinHeight(334);
         stage.setScene(scene);
+        controller.attachStage(stage);
 
         controller.displayPane().setOnMousePressed(event -> {
             dragOffsetX = event.getScreenX() - stage.getX();
@@ -47,23 +64,13 @@ public class Main extends Application {
             stage.setY(event.getScreenY() - dragOffsetY);
         });
 
-        controller.resizeHandle().setOnMousePressed(event -> {
-            resizing = true;
-            resizeStartX = event.getScreenX();
-            resizeStartWidth = stage.getWidth();
-        });
-        controller.resizeHandle().setOnMouseDragged(event -> {
-            double width = Math.max(stage.getMinWidth(), resizeStartWidth + event.getScreenX() - resizeStartX);
-            stage.setWidth(width);
-            stage.setHeight(width / ASPECT_RATIO);
-        });
-        controller.resizeHandle().setOnMouseReleased(event -> resizing = false);
+        sceneRoot.setOnMouseMoved(event -> sceneRoot.setCursor(resizeDirection(event, scene).cursor));
+        sceneRoot.setOnMousePressed(event -> beginResize(event, scene, stage));
+        sceneRoot.setOnMouseDragged(event -> resize(event, stage));
+        sceneRoot.setOnMouseReleased(event -> activeResizeDirection = ResizeDirection.NONE);
 
-        stage.widthProperty().addListener((observable, oldValue, newValue) -> {
-            if (!resizing) {
-                stage.setHeight(newValue.doubleValue() / ASPECT_RATIO);
-            }
-        });
+        stage.widthProperty().addListener((observable, oldValue, newValue) -> applyScale(stage, contentGroup));
+        stage.heightProperty().addListener((observable, oldValue, newValue) -> applyScale(stage, contentGroup));
 
         scene.setOnKeyPressed(event -> {
             KeyCode code = event.getCode();
@@ -106,7 +113,125 @@ public class Main extends Application {
         });
 
         stage.show();
+        applyScale(stage, contentGroup);
         WindowsTransparency.apply(stage, WindowsTransparency.Backdrop.ACRYLIC);
         controller.root().requestFocus();
+    }
+
+    private void applyScale(Stage stage, Group contentGroup) {
+        double scale = Math.min(stage.getWidth() / BASE_WIDTH, stage.getHeight() / BASE_HEIGHT);
+        contentGroup.setScaleX(scale);
+        contentGroup.setScaleY(scale);
+        contentGroup.setLayoutX((stage.getWidth() - BASE_WIDTH * scale) / 2.0);
+        contentGroup.setLayoutY((stage.getHeight() - BASE_HEIGHT * scale) / 2.0);
+    }
+
+    private ResizeDirection resizeDirection(MouseEvent event, Scene scene) {
+        double x = event.getX();
+        double y = event.getY();
+        boolean left = x <= RESIZE_BORDER;
+        boolean right = x >= scene.getWidth() - RESIZE_BORDER;
+        boolean top = y <= RESIZE_BORDER;
+        boolean bottom = y >= scene.getHeight() - RESIZE_BORDER;
+
+        if (top && left) {
+            return ResizeDirection.NORTH_WEST;
+        }
+        if (top && right) {
+            return ResizeDirection.NORTH_EAST;
+        }
+        if (bottom && left) {
+            return ResizeDirection.SOUTH_WEST;
+        }
+        if (bottom && right) {
+            return ResizeDirection.SOUTH_EAST;
+        }
+        if (top) {
+            return ResizeDirection.NORTH;
+        }
+        if (bottom) {
+            return ResizeDirection.SOUTH;
+        }
+        if (left) {
+            return ResizeDirection.WEST;
+        }
+        if (right) {
+            return ResizeDirection.EAST;
+        }
+        return ResizeDirection.NONE;
+    }
+
+    private void beginResize(MouseEvent event, Scene scene, Stage stage) {
+        activeResizeDirection = resizeDirection(event, scene);
+        if (activeResizeDirection == ResizeDirection.NONE) {
+            return;
+        }
+        resizeStartScreenX = event.getScreenX();
+        resizeStartScreenY = event.getScreenY();
+        resizeStartStageX = stage.getX();
+        resizeStartStageY = stage.getY();
+        resizeStartWidth = stage.getWidth();
+        resizeStartHeight = stage.getHeight();
+        event.consume();
+    }
+
+    private void resize(MouseEvent event, Stage stage) {
+        if (activeResizeDirection == ResizeDirection.NONE) {
+            return;
+        }
+
+        double deltaX = event.getScreenX() - resizeStartScreenX;
+        double deltaY = event.getScreenY() - resizeStartScreenY;
+        double x = resizeStartStageX;
+        double y = resizeStartStageY;
+        double width = resizeStartWidth;
+        double height = resizeStartHeight;
+
+        if (activeResizeDirection.west) {
+            width = Math.max(stage.getMinWidth(), resizeStartWidth - deltaX);
+            x = resizeStartStageX + resizeStartWidth - width;
+        }
+        if (activeResizeDirection.east) {
+            width = Math.max(stage.getMinWidth(), resizeStartWidth + deltaX);
+        }
+        if (activeResizeDirection.north) {
+            height = Math.max(stage.getMinHeight(), resizeStartHeight - deltaY);
+            y = resizeStartStageY + resizeStartHeight - height;
+        }
+        if (activeResizeDirection.south) {
+            height = Math.max(stage.getMinHeight(), resizeStartHeight + deltaY);
+        }
+
+        stage.setX(x);
+        stage.setY(y);
+        stage.setWidth(width);
+        stage.setHeight(height);
+        event.consume();
+    }
+
+    private enum ResizeDirection {
+        NONE(Cursor.DEFAULT, false, false, false, false),
+        NORTH(Cursor.N_RESIZE, true, false, false, false),
+        SOUTH(Cursor.S_RESIZE, false, true, false, false),
+        WEST(Cursor.W_RESIZE, false, false, true, false),
+        EAST(Cursor.E_RESIZE, false, false, false, true),
+        NORTH_WEST(Cursor.NW_RESIZE, true, false, true, false),
+        NORTH_EAST(Cursor.NE_RESIZE, true, false, false, true),
+        SOUTH_WEST(Cursor.SW_RESIZE, false, true, true, false),
+        SOUTH_EAST(Cursor.SE_RESIZE, false, true, false, true);
+
+        private final Cursor cursor;
+        private final boolean north;
+        private final boolean south;
+        private final boolean west;
+        private final boolean east;
+
+        ResizeDirection(Cursor cursor, boolean north, boolean south, boolean west, boolean east) {
+            this.cursor = cursor;
+            this.north = north;
+            this.south = south;
+            this.west = west;
+            this.east = east;
+        }
     }
 }

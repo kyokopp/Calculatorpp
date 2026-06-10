@@ -1,10 +1,16 @@
 .root {
-    -fx-font-family: "Segoe UI Variable Display", "Segoe UI", sans-serif;
+    -fx-font-family: "SF Pro Rounded", "Segoe UI Variable Display", "Segoe UI", sans-serif;
     -fx-background-color: transparent;
+}
+
+.scene-root {
+    -fx-background-color: transparent;
+    -fx-cursor: default;
 }
 
 .window-root {
     -fx-background-color: transparent;
+    -fx-cursor: default;
 }
 
 .calculator-shell {
@@ -21,11 +27,12 @@
     -fx-pref-height: 120;
     -fx-padding: 0 2 10 0;
     -fx-background-color: transparent;
-    -fx-cursor: move;
+    -fx-cursor: default;
 }
 
 .display-label {
     -fx-text-fill: #ffffff;
+    -fx-font-family: "SF Pro Rounded", "Segoe UI Variable Display", "Segoe UI", sans-serif;
     -fx-font-weight: 300;
     -fx-alignment: bottom-right;
     -fx-padding: 0 0 0 0;
@@ -40,9 +47,9 @@
     -fx-background-radius: 999;
     -fx-border-radius: 999;
     -fx-border-width: 0;
-    -fx-cursor: hand;
+    -fx-cursor: default;
     -fx-text-fill: #ffffff;
-    -fx-font-family: "Segoe UI Variable Display", "Segoe UI", sans-serif;
+    -fx-font-family: "SF Pro Rounded", "Segoe UI Variable Display", "Segoe UI", sans-serif;
     -fx-font-size: 28;
     -fx-font-weight: 400;
     -fx-padding: 0;
@@ -72,11 +79,49 @@
     -fx-padding: 0 0 0 28;
 }
 
-.resize-handle {
-    -fx-min-width: 18;
-    -fx-min-height: 18;
-    -fx-pref-width: 18;
-    -fx-pref-height: 18;
-    -fx-background-color: transparent;
-    -fx-cursor: se-resize;
+.traffic-lights {
+    -fx-spacing: 8;
+    -fx-alignment: center-left;
+    -fx-cursor: default;
+}
+
+.traffic-button {
+    -fx-min-width: 12;
+    -fx-min-height: 12;
+    -fx-pref-width: 12;
+    -fx-pref-height: 12;
+    -fx-max-width: 12;
+    -fx-max-height: 12;
+    -fx-background-radius: 999;
+    -fx-border-radius: 999;
+    -fx-padding: 0;
+    -fx-font-size: 7;
+    -fx-font-weight: 700;
+    -fx-text-fill: rgba(58, 58, 60, 0.84);
+    -fx-alignment: center;
+    -fx-cursor: default;
+}
+
+.close-dot {
+    -fx-background-color: #ff5f57;
+}
+
+.minimize-dot {
+    -fx-background-color: #ffbd2e;
+}
+
+.maximize-dot {
+    -fx-background-color: #28c840;
+}
+
+.close-dot:pressed {
+    -fx-background-color: #cc4c46;
+}
+
+.minimize-dot:pressed {
+    -fx-background-color: #cc9725;
+}
+
+.maximize-dot:pressed {
+    -fx-background-color: #20a033;
 }

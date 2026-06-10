@@ -1,6 +1,7 @@
 package com.calculator.ui;
 
 import javafx.geometry.Pos;
+import javafx.scene.Cursor;
 import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 
@@ -10,6 +11,8 @@ public class DisplayPane extends StackPane {
 
     public DisplayPane() {
         getStyleClass().add("display-pane");
+        setCursor(Cursor.DEFAULT);
+        setMouseTransparent(false);
         label.getStyleClass().add("display-label");
         setAlignment(Pos.BOTTOM_RIGHT);
         getChildren().add(label);

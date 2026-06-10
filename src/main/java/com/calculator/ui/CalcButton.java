@@ -1,6 +1,7 @@
 package com.calculator.ui;
 
 import javafx.animation.ScaleTransition;
+import javafx.scene.Cursor;
 import javafx.scene.control.Button;
 import javafx.scene.effect.ColorAdjust;
 import javafx.util.Duration;
@@ -15,6 +16,8 @@ public class CalcButton extends Button {
         getStyleClass().addAll(role.styleClasses);
         setEffect(colorAdjust);
         setFocusTraversable(false);
+        setCursor(Cursor.DEFAULT);
+        setMouseTransparent(false);
         setMinSize(role == ButtonRole.ZERO ? 156 : 72, 72);
         setPrefSize(role == ButtonRole.ZERO ? 156 : 72, 72);
         setMaxSize(role == ButtonRole.ZERO ? 156 : 72, 72);
