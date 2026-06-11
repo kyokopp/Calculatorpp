@@ -15,7 +15,6 @@ public class Main extends Application {
 
     private static final double BASE_WIDTH = 336.0;
     private static final double CONTENT_HEIGHT = 560.0;
-    private static final double TITLE_BAR_HEIGHT = 36.0;
     private static final double RESIZE_BORDER = 6.0;
 
     private double dragOffsetX;
@@ -39,7 +38,7 @@ public class Main extends Application {
         FontLoader.loadFonts();
 
         CalculatorController controller = new CalculatorController();
-        Scene scene = new Scene(controller.root(), BASE_WIDTH, CONTENT_HEIGHT + TITLE_BAR_HEIGHT);
+        Scene scene = new Scene(controller.root(), BASE_WIDTH, CONTENT_HEIGHT);
         scene.setFill(Color.TRANSPARENT);
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/styles/calculator.css")).toExternalForm());
 
@@ -62,12 +61,22 @@ public class Main extends Application {
             }
         });
 
+
+
         controller.root().setOnMouseMoved(event -> {
-            manualResizing = false;
-            activeResizeDirection = resizeDirection(event, scene);
-            controller.root().setCursor(activeResizeDirection.cursor);
+            if (!manualResizing) {
+                activeResizeDirection = resizeDirection(event, scene);
+                controller.root().setCursor(activeResizeDirection.cursor);
+            }
         });
-        controller.root().setOnMouseDragged(event -> resize(event, scene, stage));
+        controller.root().setOnMouseDragged(event -> {
+            if (activeResizeDirection != ResizeDirection.NONE || resizeDirection(event, scene) != ResizeDirection.NONE) {
+                resize(event, scene, stage);
+            }
+        });
+        controller.root().setOnMouseReleased(event -> {
+            manualResizing = false;
+        });
 
         stage.widthProperty().addListener((observable, oldValue, newValue) -> applyScale(stage, controller));
         stage.heightProperty().addListener((observable, oldValue, newValue) -> applyScale(stage, controller));
@@ -112,18 +121,22 @@ public class Main extends Application {
             }
         });
 
+        stage.setOnShown(event -> {
+            applyScale(stage, controller);
+            WindowsTransparency.apply(stage, WindowsTransparency.Backdrop.ACRYLIC);
+            controller.root().requestFocus();
+        });
         stage.show();
         applyScale(stage, controller);
-        WindowsTransparency.apply(stage, WindowsTransparency.Backdrop.ACRYLIC);
         controller.root().requestFocus();
     }
 
     private void applyScale(Stage stage, CalculatorController controller) {
-        double scale = Math.min(stage.getWidth() / BASE_WIDTH, (stage.getHeight() - TITLE_BAR_HEIGHT) / CONTENT_HEIGHT);
+        double scale = Math.min(stage.getWidth() / BASE_WIDTH, stage.getHeight() / CONTENT_HEIGHT);
         controller.scaleGroup().setScaleX(scale);
         controller.scaleGroup().setScaleY(scale);
         controller.scaleGroup().setTranslateX((stage.getWidth() - BASE_WIDTH * scale) / 2.0);
-        controller.scaleGroup().setTranslateY(Math.max(0.0, (stage.getHeight() - TITLE_BAR_HEIGHT - CONTENT_HEIGHT * scale) / 2.0));
+        controller.scaleGroup().setTranslateY((stage.getHeight() - CONTENT_HEIGHT * scale) / 2.0);
     }
 
     private ResizeDirection resizeDirection(MouseEvent event, Scene scene) {

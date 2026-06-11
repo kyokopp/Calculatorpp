@@ -12,10 +12,11 @@
     -fx-min-height: 36;
     -fx-pref-height: 36;
     -fx-max-height: 36;
-    -fx-padding: 0 0 0 14;
+    -fx-padding: 12 0 0 14;
     -fx-spacing: 8;
     -fx-alignment: center-left;
     -fx-background-color: transparent;
+    -fx-background-radius: 12 12 0 0;
     -fx-cursor: default;
 }
 
@@ -75,8 +76,8 @@
 }
 
 .display-pane {
-    -fx-min-height: 120;
-    -fx-pref-height: 120;
+    -fx-min-height: 98;
+    -fx-pref-height: 98;
     -fx-padding: 0 2 10 0;
     -fx-background-color: transparent;
     -fx-cursor: default;
