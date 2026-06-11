@@ -6,4 +6,5 @@ module calculatorpp {
 
     exports calculatorpp;
     exports com.calculator;
+    exports com.calculator.ui;
 }

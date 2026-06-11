@@ -7,6 +7,8 @@ import javafx.geometry.Insets;
 import javafx.scene.Group;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -26,21 +28,27 @@ public class CalculatorController {
     public CalculatorController() {
         root.getStyleClass().add("window-root");
         root.setFocusTraversable(true);
-        root.setPrefSize(336, 596);
-        root.setMinSize(336, 596);
+        root.setPrefSize(336, 560);
+        root.setMinSize(336, 560);
 
-        VBox scalableContent = new VBox(12);
+        VBox scalableContent = new VBox();
         scalableContent.getStyleClass().add("calculator-shell");
-        scalableContent.setPadding(new Insets(18, 18, 18, 18));
+        scalableContent.setPadding(new Insets(0, 18, 18, 18));
         scalableContent.setPrefSize(336, 560);
         scalableContent.setMinSize(336, 560);
         scalableContent.setMaxSize(336, 560);
-        scalableContent.getChildren().addAll(displayPane, keypad());
+        scalableContent.getChildren().addAll(windowControls.root(), displayPane, keypad());
+        VBox.setVgrow(windowControls.root(), Priority.NEVER);
         VBox.setVgrow(displayPane, Priority.NEVER);
 
         scaleGroup = new Group(scalableContent);
 
-        root.getChildren().addAll(windowControls.root(), scaleGroup);
+        StackPane scaleWrapper = new StackPane(scaleGroup);
+        scaleWrapper.setMinSize(0, 0);
+        scaleWrapper.setPrefSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
+        VBox.setVgrow(scaleWrapper, Priority.ALWAYS);
+
+        root.getChildren().add(scaleWrapper);
         refresh();
     }
 
@@ -54,6 +62,10 @@ public class CalculatorController {
 
     public DisplayPane displayPane() {
         return displayPane;
+    }
+
+    public WindowControls windowControls() {
+        return windowControls;
     }
 
     public void attachStage(Stage stage) {
