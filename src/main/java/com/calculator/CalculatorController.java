@@ -4,6 +4,8 @@ import com.calculator.ui.CalcButton;
 import com.calculator.ui.DisplayPane;
 import com.calculator.ui.WindowControls;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.CacheHint;
 import javafx.scene.Group;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
@@ -28,22 +30,31 @@ public class CalculatorController {
     public CalculatorController() {
         root.getStyleClass().add("window-root");
         root.setFocusTraversable(true);
+        root.setSnapToPixel(false);
         root.setPrefSize(336, 560);
         root.setMinSize(336, 560);
 
         VBox scalableContent = new VBox();
         scalableContent.getStyleClass().add("calculator-shell");
-        scalableContent.setPadding(new Insets(0, 18, 18, 18));
+        scalableContent.setPickOnBounds(false);
         scalableContent.setPrefSize(336, 560);
         scalableContent.setMinSize(336, 560);
         scalableContent.setMaxSize(336, 560);
         scalableContent.getChildren().addAll(windowControls.root(), displayPane, keypad());
         VBox.setVgrow(windowControls.root(), Priority.NEVER);
+        VBox.setMargin(windowControls.root(), new Insets(0));
         VBox.setVgrow(displayPane, Priority.NEVER);
 
         scaleGroup = new Group(scalableContent);
+        scaleGroup.setPickOnBounds(false);
+        scaleGroup.setCache(false);
+        scaleGroup.setCacheHint(CacheHint.QUALITY);
 
         StackPane scaleWrapper = new StackPane(scaleGroup);
+        scaleWrapper.setAlignment(Pos.CENTER);
+        scaleWrapper.setPickOnBounds(false);
+        scaleWrapper.setStyle("-fx-background-color: transparent;");
+        scaleWrapper.setSnapToPixel(false);
         scaleWrapper.setMinSize(0, 0);
         scaleWrapper.setPrefSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
         VBox.setVgrow(scaleWrapper, Priority.ALWAYS);
