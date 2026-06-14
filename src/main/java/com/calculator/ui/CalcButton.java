@@ -29,13 +29,15 @@ public class CalcButton extends Button {
         setMinSize(role == ButtonRole.ZERO ? 156 : 72, 72);
         setPrefSize(role == ButtonRole.ZERO ? 156 : 72, 72);
         setMaxSize(role == ButtonRole.ZERO ? 156 : 72, 72);
-        releaseTransition.setOnFinished(event -> setCacheHint(CacheHint.DEFAULT));
+        releaseTransition.setOnFinished(event -> {
+            setCache(true);
+            setCacheHint(CacheHint.DEFAULT);
+        });
         setOnMousePressed(event -> {
-            setCacheHint(CacheHint.SPEED);
+            setCache(false);
             pressTransition.playFromStart();
         });
         setOnMouseReleased(event -> {
-            setCacheHint(CacheHint.SPEED);
             releaseTransition.playFromStart();
         });
         setOnMouseClicked(event -> event.consume());

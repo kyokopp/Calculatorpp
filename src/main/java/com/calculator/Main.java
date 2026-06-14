@@ -16,7 +16,7 @@ import java.util.Objects;
 public class Main extends Application {
 
     private static final double BASE_WIDTH = 336.0;
-    private static final double CONTENT_HEIGHT = 560.0;
+    private static final double CONTENT_HEIGHT = 588.0;
     private static final double RESIZE_BORDER = 6.0;
 
     private double dragOffsetX;
@@ -37,6 +37,8 @@ public class Main extends Application {
         System.setProperty("prism.lcdtext", "true");
         System.setProperty("prism.text", "t2k");
         System.setProperty("prism.subpixeltext", "true");
+        System.setProperty("prism.allowhidpi", "true");
+        System.setProperty("glass.win.uiScale", "1.0");
         launch(args);
     }
 
@@ -144,6 +146,16 @@ public class Main extends Application {
             controller.root().requestFocus();
         });
         stage.show();
+
+        controller.root().setStyle("-fx-background-color: transparent; -fx-background-radius: 12;");
+
+        javafx.scene.shape.Rectangle clip = new javafx.scene.shape.Rectangle();
+        clip.setArcWidth(24);
+        clip.setArcHeight(24);
+        clip.widthProperty().bind(controller.root().widthProperty());
+        clip.heightProperty().bind(controller.root().heightProperty());
+        controller.root().setClip(clip);
+
         applyScale(stage, controller);
         new AnimationTimer() {
             @Override

@@ -19,6 +19,7 @@
     -fx-alignment: center-left;
     -fx-background-color: transparent;
     -fx-background-radius: 12 12 0 0;
+    -fx-border-radius: 12 12 0 0;
     -fx-cursor: default;
 }
 
@@ -79,14 +80,15 @@
 }
 
 .display-pane {
-    -fx-min-height: 96;
-    -fx-pref-height: 96;
+    -fx-min-height: 124;
+    -fx-pref-height: 124;
     -fx-padding: 0 2 10 0;
     -fx-background-color: transparent;
     -fx-cursor: default;
 }
 
 .display-label {
+    -fx-font-smoothing-type: lcd;
     -fx-text-fill: #ffffff;
     -fx-font-family: "SF Pro Display", "Segoe UI Variable Display", "Segoe UI", sans-serif;
     -fx-font-weight: 300;
@@ -100,6 +102,7 @@
 }
 
 .calc-button {
+    -fx-font-smoothing-type: lcd;
     -fx-background-radius: 999;
     -fx-border-radius: 999;
     -fx-border-width: 0;
@@ -158,4 +161,17 @@
 .zero-button {
     -fx-alignment: center-left;
     -fx-padding: 0 0 0 28;
+}
+
+.expression-label {
+    -fx-font-smoothing-type: lcd;
+    -fx-font-family: "SF Pro Display", "Segoe UI Variable Display", "Segoe UI", sans-serif;
+    -fx-font-size: 20px;
+    -fx-font-weight: 300;
+    -fx-text-fill: rgba(255, 255, 255, 0.45);
+    -fx-alignment: bottom-right;
+    -fx-padding: 0 2 2 0;
+    -fx-min-height: 26px;
+    -fx-pref-height: 26px;
+    -fx-max-height: 26px;
 }

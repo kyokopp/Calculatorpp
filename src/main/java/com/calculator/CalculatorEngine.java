@@ -15,11 +15,13 @@ public class CalculatorEngine {
     private String activeOperator;
     private String lastOperator;
     private Double lastOperand;
+    private String completedExpression;
     private boolean enteringNewNumber;
     private boolean error;
 
     public void inputDigit(String digit) {
         recoverFromError();
+        completedExpression = null;
         if (enteringNewNumber) {
             currentInput = digit;
             enteringNewNumber = false;
@@ -38,6 +40,7 @@ public class CalculatorEngine {
 
     public void inputDecimal() {
         recoverFromError();
+        completedExpression = null;
         if (enteringNewNumber) {
             currentInput = "0.";
             enteringNewNumber = false;
@@ -50,6 +53,7 @@ public class CalculatorEngine {
 
     public void chooseOperator(String operator) {
         recoverFromError();
+        completedExpression = null;
         double value = currentValue();
         if (pendingOperator != null && !enteringNewNumber) {
             if (!applyPending(value)) {
@@ -66,11 +70,13 @@ public class CalculatorEngine {
     public void equals() {
         recoverFromError();
         if (pendingOperator != null) {
+            double left = accumulator;
             double operand = currentValue();
             String operator = pendingOperator;
             if (applyPending(operand)) {
                 lastOperator = operator;
                 lastOperand = operand;
+                completedExpression = formatExpression(left, operator, operand);
                 pendingOperator = null;
                 activeOperator = null;
                 enteringNewNumber = true;
@@ -78,9 +84,11 @@ public class CalculatorEngine {
             return;
         }
         if (lastOperator != null && lastOperand != null) {
-            double result = calculate(currentValue(), lastOperand, lastOperator);
+            double left = currentValue();
+            double result = calculate(left, lastOperand, lastOperator);
             currentInput = format(result);
             accumulator = result;
+            completedExpression = formatExpression(left, lastOperator, lastOperand);
             enteringNewNumber = true;
         }
     }
@@ -93,10 +101,12 @@ public class CalculatorEngine {
         currentInput = "0";
         error = false;
         enteringNewNumber = false;
+        completedExpression = null;
     }
 
     public void toggleSign() {
         recoverFromError();
+        completedExpression = null;
         if ("0".equals(currentInput)) {
             currentInput = "-0";
             return;
@@ -114,12 +124,14 @@ public class CalculatorEngine {
 
     public void percent() {
         recoverFromError();
+        completedExpression = null;
         currentInput = format(currentValue() / 100.0);
         enteringNewNumber = false;
     }
 
     public void backspace() {
         recoverFromError();
+        completedExpression = null;
         if (enteringNewNumber) {
             return;
         }
@@ -143,6 +155,15 @@ public class CalculatorEngine {
 
     public String activeOperator() {
         return activeOperator;
+    }
+
+    public String expressionText() {
+        if (error) return "";
+        if (completedExpression != null) return completedExpression;
+        if (pendingOperator != null) {
+            return format(accumulator) + " " + pendingOperator;
+        }
+        return "";
     }
 
     private boolean applyPending(double operand) {
@@ -199,6 +220,10 @@ public class CalculatorEngine {
         return "-0".equals(formatted) ? "0" : formatted;
     }
 
+    private String formatExpression(double left, String operator, double right) {
+        return format(left) + " " + operator + " " + format(right) + " =";
+    }
+
     private void recoverFromError() {
         if (error) {
             resetAll();
@@ -212,6 +237,7 @@ public class CalculatorEngine {
         activeOperator = null;
         lastOperator = null;
         lastOperand = null;
+        completedExpression = null;
         enteringNewNumber = false;
         error = false;
     }
