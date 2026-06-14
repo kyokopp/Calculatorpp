@@ -45,8 +45,8 @@ public class Main extends Application {
         stage.initStyle(StageStyle.TRANSPARENT);
         stage.setTitle("Calculatorpp");
         stage.setResizable(true);
-        stage.setMinWidth(200);
-        stage.setMinHeight(334);
+        stage.setMinWidth(250);
+        stage.setMinHeight(250);
         stage.setScene(scene);
         controller.attachStage(stage);
 

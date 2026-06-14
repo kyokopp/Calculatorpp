@@ -1,5 +1,5 @@
 .root {
-    -fx-font-family: "SF Pro Rounded", "Segoe UI Variable Display", "Segoe UI", sans-serif;
+    -fx-font-family: "SF Pro Display", "Segoe UI Variable Display", "Segoe UI", sans-serif;
     -fx-background-color: transparent;
 }
 
@@ -17,7 +17,7 @@
     -fx-alignment: center-left;
     -fx-background-color: transparent;
     -fx-background-radius: 12 12 0 0;
-    -fx-cursor: default;
+    -fx-cursor: pointer;
 }
 
 .traffic-dot {
@@ -59,7 +59,7 @@
 }
 
 .traffic-icon {
-    -fx-font-family: "SF Pro Rounded", "Segoe UI Variable Display", "Segoe UI", sans-serif;
+    -fx-font-family: "SF Pro Display", "Segoe UI Variable Display", "Segoe UI", sans-serif;
     -fx-font-size: 7;
     -fx-font-weight: 700;
     -fx-text-fill: rgba(58, 58, 60, 0.84);
@@ -69,6 +69,7 @@
 .calculator-shell {
     -fx-background-color: rgba(28, 28, 30, 0.85);
     -fx-background-radius: 12;
+    -fx-padding: 0 18 18 18;
     -fx-border-color: rgba(255, 255, 255, 0.16);
     -fx-border-radius: 12;
     -fx-border-width: 1;
@@ -76,8 +77,8 @@
 }
 
 .display-pane {
-    -fx-min-height: 98;
-    -fx-pref-height: 98;
+    -fx-min-height: 96;
+    -fx-pref-height: 96;
     -fx-padding: 0 2 10 0;
     -fx-background-color: transparent;
     -fx-cursor: default;
@@ -85,7 +86,7 @@
 
 .display-label {
     -fx-text-fill: #ffffff;
-    -fx-font-family: "SF Pro Rounded", "Segoe UI Variable Display", "Segoe UI", sans-serif;
+    -fx-font-family: "SF Pro Display", "Segoe UI Variable Display", "Segoe UI", sans-serif;
     -fx-font-weight: 300;
     -fx-alignment: bottom-right;
     -fx-padding: 0 0 0 0;
@@ -102,7 +103,7 @@
     -fx-border-width: 0;
     -fx-cursor: default;
     -fx-text-fill: #ffffff;
-    -fx-font-family: "SF Pro Rounded", "Segoe UI Variable Display", "Segoe UI", sans-serif;
+    -fx-font-family: "SF Pro Display", "Segoe UI Variable Display", "Segoe UI", sans-serif;
     -fx-font-size: 28;
     -fx-font-weight: 300;
     -fx-padding: 0;

@@ -3,7 +3,6 @@ package com.calculator;
 import com.calculator.ui.CalcButton;
 import com.calculator.ui.DisplayPane;
 import com.calculator.ui.WindowControls;
-import javafx.geometry.Insets;
 import javafx.scene.Group;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
@@ -33,7 +32,6 @@ public class CalculatorController {
 
         VBox scalableContent = new VBox();
         scalableContent.getStyleClass().add("calculator-shell");
-        scalableContent.setPadding(new Insets(0, 18, 18, 18));
         scalableContent.setPrefSize(336, 560);
         scalableContent.setMinSize(336, 560);
         scalableContent.setMaxSize(336, 560);
