@@ -70,4 +70,17 @@ class CalculatorEngineTest {
 
         assertEquals("4", engine.displayText());
     }
+
+    @Test
+    void keepsCompletedExpressionAfterEquals() {
+        CalculatorEngine engine = new CalculatorEngine();
+
+        engine.inputDigit("5");
+        engine.chooseOperator("+");
+        engine.inputDigit("2");
+        engine.equals();
+
+        assertEquals("7", engine.displayText());
+        assertEquals("5 + 2 =", engine.expressionText());
+    }
 }

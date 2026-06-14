@@ -31,15 +31,15 @@ public class CalculatorController {
         root.getStyleClass().add("window-root");
         root.setFocusTraversable(true);
         root.setSnapToPixel(false);
-        root.setPrefSize(336, 560);
-        root.setMinSize(336, 560);
+        root.setPrefSize(336, 588);
+        root.setMinSize(336, 588);
 
         VBox scalableContent = new VBox();
         scalableContent.getStyleClass().add("calculator-shell");
         scalableContent.setPickOnBounds(false);
-        scalableContent.setPrefSize(336, 560);
-        scalableContent.setMinSize(336, 560);
-        scalableContent.setMaxSize(336, 560);
+        scalableContent.setPrefSize(336, 588);
+        scalableContent.setMinSize(336, 588);
+        scalableContent.setMaxSize(336, 588);
         scalableContent.getChildren().addAll(windowControls.root(), displayPane, keypad());
         VBox.setVgrow(windowControls.root(), Priority.NEVER);
         VBox.setMargin(windowControls.root(), new Insets(0));
@@ -174,6 +174,7 @@ public class CalculatorController {
 
     private void refresh() {
         displayPane.setDisplayText(engine.displayText());
+        displayPane.setExpressionText(engine.expressionText());
         if (clearButton != null) {
             clearButton.setText(engine.clearLabel());
         }
