@@ -1,7 +1,9 @@
 package com.calculator;
 
+import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.scene.Cursor;
+import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseEvent;
@@ -26,10 +28,15 @@ public class Main extends Application {
     private double resizeStartWidth;
     private double resizeStartHeight;
     private boolean manualResizing;
+    private boolean isMoving;
+    private boolean scaleDirty;
     private ResizeDirection activeResizeDirection = ResizeDirection.NONE;
 
     public static void main(String[] args) {
         System.setProperty("prism.forceUploadingPainter", "true");
+        System.setProperty("prism.lcdtext", "true");
+        System.setProperty("prism.text", "t2k");
+        System.setProperty("prism.subpixeltext", "true");
         launch(args);
     }
 
@@ -45,41 +52,51 @@ public class Main extends Application {
         stage.initStyle(StageStyle.TRANSPARENT);
         stage.setTitle("Calculatorpp");
         stage.setResizable(true);
-        stage.setMinWidth(250);
-        stage.setMinHeight(250);
+        stage.setMinWidth(200);
+        stage.setMinHeight(334);
         stage.setScene(scene);
         controller.attachStage(stage);
 
         controller.displayPane().setOnMousePressed(event -> {
+            isMoving = true;
             dragOffsetX = event.getScreenX() - stage.getX();
             dragOffsetY = event.getScreenY() - stage.getY();
         });
         controller.displayPane().setOnMouseDragged(event -> {
-            if (!stage.isMaximized()) {
+            if (isMoving && !manualResizing && !stage.isMaximized()) {
                 stage.setX(event.getScreenX() - dragOffsetX);
                 stage.setY(event.getScreenY() - dragOffsetY);
             }
         });
-
-
+        controller.displayPane().setOnMouseReleased(event -> isMoving = false);
 
         controller.root().setOnMouseMoved(event -> {
-            if (!manualResizing) {
-                activeResizeDirection = resizeDirection(event, scene);
-                controller.root().setCursor(activeResizeDirection.cursor);
+            if (isMoving || manualResizing) {
+                return;
             }
+            if (!isNearEdge(event, scene)) {
+                activeResizeDirection = ResizeDirection.NONE;
+                controller.root().setCursor(Cursor.DEFAULT);
+                return;
+            }
+            activeResizeDirection = resizeDirection(event, scene);
+            controller.root().setCursor(activeResizeDirection.cursor);
         });
         controller.root().setOnMouseDragged(event -> {
+            if (isMoving) {
+                return;
+            }
             if (activeResizeDirection != ResizeDirection.NONE || resizeDirection(event, scene) != ResizeDirection.NONE) {
                 resize(event, scene, stage);
             }
         });
         controller.root().setOnMouseReleased(event -> {
             manualResizing = false;
+            isMoving = false;
         });
 
-        stage.widthProperty().addListener((observable, oldValue, newValue) -> applyScale(stage, controller));
-        stage.heightProperty().addListener((observable, oldValue, newValue) -> applyScale(stage, controller));
+        stage.widthProperty().addListener((observable, oldValue, newValue) -> scaleDirty = true);
+        stage.heightProperty().addListener((observable, oldValue, newValue) -> scaleDirty = true);
 
         scene.setOnKeyPressed(event -> {
             KeyCode code = event.getCode();
@@ -128,15 +145,36 @@ public class Main extends Application {
         });
         stage.show();
         applyScale(stage, controller);
+        new AnimationTimer() {
+            @Override
+            public void handle(long now) {
+                if (scaleDirty) {
+                    applyScale(stage, controller);
+                    scaleDirty = false;
+                }
+            }
+        }.start();
         controller.root().requestFocus();
     }
 
     private void applyScale(Stage stage, CalculatorController controller) {
-        double scale = Math.min(stage.getWidth() / BASE_WIDTH, stage.getHeight() / CONTENT_HEIGHT);
-        controller.scaleGroup().setScaleX(scale);
-        controller.scaleGroup().setScaleY(scale);
-        controller.scaleGroup().setTranslateX((stage.getWidth() - BASE_WIDTH * scale) / 2.0);
-        controller.scaleGroup().setTranslateY((stage.getHeight() - CONTENT_HEIGHT * scale) / 2.0);
+        double stageWidth = stage.getWidth();
+        double stageHeight = stage.getHeight();
+        double scale = Math.min(stageWidth / BASE_WIDTH, stageHeight / CONTENT_HEIGHT);
+        scale = Math.max(scale, 0.3);
+        Group scaleGroup = controller.scaleGroup();
+        scaleGroup.setScaleX(scale);
+        scaleGroup.setScaleY(scale);
+        scaleGroup.setTranslateX((stageWidth - BASE_WIDTH * scale) / 2.0);
+        scaleGroup.setTranslateY((stageHeight - CONTENT_HEIGHT * scale) / 2.0);
+    }
+
+    private boolean isNearEdge(MouseEvent event, Scene scene) {
+        double x = event.getSceneX();
+        double y = event.getSceneY();
+        double width = scene.getWidth();
+        double height = scene.getHeight();
+        return x <= RESIZE_BORDER || x >= width - RESIZE_BORDER || y <= RESIZE_BORDER || y >= height - RESIZE_BORDER;
     }
 
     private ResizeDirection resizeDirection(MouseEvent event, Scene scene) {

@@ -5,6 +5,8 @@
 
 .window-root {
     -fx-background-color: transparent;
+    -fx-background-radius: 12;
+    -fx-border-radius: 12;
     -fx-cursor: default;
 }
 
@@ -12,12 +14,12 @@
     -fx-min-height: 36;
     -fx-pref-height: 36;
     -fx-max-height: 36;
-    -fx-padding: 12 0 0 14;
+    -fx-padding: 14 0 0 14;
     -fx-spacing: 8;
     -fx-alignment: center-left;
     -fx-background-color: transparent;
     -fx-background-radius: 12 12 0 0;
-    -fx-cursor: pointer;
+    -fx-cursor: default;
 }
 
 .traffic-dot {
@@ -114,14 +116,38 @@
     -fx-background-color: rgba(58, 58, 60, 0.9);
 }
 
+.utility-button:hover {
+    -fx-background-color: rgba(78, 78, 80, 0.9);
+}
+
+.utility-button:pressed {
+    -fx-background-color: rgba(48, 48, 50, 0.9);
+}
+
 .number-button {
     -fx-background-color: rgba(28, 28, 30, 0.9);
+}
+
+.number-button:hover {
+    -fx-background-color: rgba(58, 58, 60, 0.9);
+}
+
+.number-button:pressed {
+    -fx-background-color: rgba(18, 18, 20, 0.9);
 }
 
 .operator-button {
     -fx-background-color: #ff9f0a;
     -fx-font-size: 32;
     -fx-font-weight: 700;
+}
+
+.operator-button:hover {
+    -fx-background-color: #ffb340;
+}
+
+.operator-button:pressed {
+    -fx-background-color: #e08800;
 }
 
 .operator-button:active {

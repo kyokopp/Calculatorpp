@@ -2,7 +2,7 @@ package com.calculator;
 
 import javafx.scene.text.Font;
 
-import java.io.File;
+import java.io.InputStream;
 
 public final class FontLoader {
 
@@ -10,54 +10,41 @@ public final class FontLoader {
     }
 
     public static void loadFonts() {
-        // List SF Pro font files found on this system for diagnostics
-        File fontsDir = new File("F:/AA/STUDIES/Projects/Calculatorpp/src/main/resources/fonts/:");
-        String[] sfFiles = fontsDir.list((dir, name) -> name.toLowerCase().contains("sf") && name.toLowerCase().contains("pro"));
-        String[] sfFiles2 = fontsDir.list((dir, name) -> name.toLowerCase().contains("sf") && name.toLowerCase().contains("pro"));
-        if (sfFiles != null && sfFiles.length > 0) {
-            System.out.println("SF Pro Display font files found in F:/AA/STUDIES/Projects/Calculatorpp/src/main/resources/fonts/:");
-            for (String f : sfFiles) {
-                System.out.println("  " + f);
-            }
-        } else {
-            System.err.println("No SF Pro font files found in F:/AA/STUDIES/Projects/Calculatorpp/src/main/resources/fonts/");
-        }
-
-        String[] lightVariants = {
-                "file://F:/AA/STUDIES/Projects/Calculatorpp/src/main/resources/fonts/SF-Pro-Display-Semibold.otf",
+        loadVariant(
+                "light",
+                "/fonts/SF-Pro-Display-Light.otf",
+                "file:///F:/AA/STUDIES/Projects/Calculatorpp/src/main/resources/fonts/SF-Pro-Display-Light.otf",
                 "file:///C:/Windows/Fonts/SF-Pro-Display-Light.otf"
-        };
-
-        String[] semiboldVariants = {
-                "file://F:/AA/STUDIES/Projects/Calculatorpp/src/main/resources/fonts/SF-Pro-Display-Semibold.otf",
-                "file:///C:/Windows/Fonts/SF-Pro-Display-Semibold.otf"
-        };
-
-        Font light = tryLoadFont("light", lightVariants);
-        Font bold = tryLoadFont("bold", semiboldVariants);
-        logLoaded("light", light);
-        logLoaded("bold", bold);
+        );
+        loadVariant(
+                "bold",
+                "/fonts/SF-Pro-Display-Bold.otf",
+                "file:///F:/AA/STUDIES/Projects/Calculatorpp/src/main/resources/fonts/SF-Pro-Display-Bold.otf",
+                "file:///C:/Windows/Fonts/SF-Pro-Display-Bold.otf"
+        );
     }
 
-    private static Font tryLoadFont(String variant, String[] paths) {
-        for (String path : paths) {
-            Font font = Font.loadFont(path, 14);
-            if (font != null) {
-                System.out.println("Loaded " + variant + " from: " + path);
-                return font;
+    private static void loadVariant(String variant, String classpathUri, String... fileUris) {
+        try (InputStream stream = FontLoader.class.getResourceAsStream(classpathUri)) {
+            if (stream != null) {
+                Font font = Font.loadFont(stream, 14);
+                if (font != null && "SF Pro Display".equals(font.getFamily())) {
+                    System.out.println("Loaded SF Pro Display " + variant + " from classpath.");
+                    return;
+                }
+            }
+        } catch (Exception exception) {
+            System.err.println("Warning: unable to load SF Pro Display " + variant + " from classpath.");
+        }
+
+        for (String uri : fileUris) {
+            Font font = Font.loadFont(uri, 14);
+            if (font != null && "SF Pro Display".equals(font.getFamily())) {
+                System.out.println("Loaded SF Pro Display " + variant + " from: " + uri);
+                return;
             }
         }
-        return null;
-    }
 
-    private static void logLoaded(String variant, Font font) {
-        if (font == null) {
-            System.err.println("Warning: SF Pro Display " + variant + " font was not found. Falling back to Segoe UI Variable Display, then Segoe UI.");
-            return;
-        }
-        System.out.println("Loaded: " + font.getFamily());
-        if (!"SF Pro Display".equals(font.getFamily())) {
-            System.err.println("Warning: expected SF Pro Display for " + variant + " but loaded " + font.getFamily() + ". Falling back to Segoe UI Variable Display, then Segoe UI if CSS font matching cannot use it.");
-        }
+        System.err.println("Warning: SF Pro Display " + variant + " not found. Falling back to Segoe UI Variable Display, then Segoe UI.");
     }
 }

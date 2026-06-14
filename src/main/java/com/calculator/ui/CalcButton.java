@@ -1,48 +1,48 @@
 package com.calculator.ui;
 
 import javafx.animation.ScaleTransition;
+import javafx.scene.CacheHint;
 import javafx.scene.Cursor;
 import javafx.scene.control.Button;
-import javafx.scene.effect.ColorAdjust;
 import javafx.util.Duration;
 
 public class CalcButton extends Button {
 
-    private final ColorAdjust colorAdjust = new ColorAdjust();
+    private final ScaleTransition pressTransition;
+    private final ScaleTransition releaseTransition;
 
     public CalcButton(String label, ButtonRole role) {
         super(label);
+        pressTransition = new ScaleTransition(Duration.millis(80), this);
+        pressTransition.setToX(0.95);
+        pressTransition.setToY(0.95);
+        releaseTransition = new ScaleTransition(Duration.millis(100), this);
+        releaseTransition.setToX(1.0);
+        releaseTransition.setToY(1.0);
         getStyleClass().add("calc-button");
         getStyleClass().addAll(role.styleClasses);
-        setEffect(colorAdjust);
+        setCache(true);
+        setCacheHint(CacheHint.DEFAULT);
         setFocusTraversable(false);
         setCursor(Cursor.DEFAULT);
         setMouseTransparent(false);
         setMinSize(role == ButtonRole.ZERO ? 156 : 72, 72);
         setPrefSize(role == ButtonRole.ZERO ? 156 : 72, 72);
         setMaxSize(role == ButtonRole.ZERO ? 156 : 72, 72);
-        setOnMouseEntered(event -> colorAdjust.setBrightness(0.10));
-        setOnMouseExited(event -> colorAdjust.setBrightness(0.0));
+        releaseTransition.setOnFinished(event -> setCacheHint(CacheHint.DEFAULT));
         setOnMousePressed(event -> {
-            colorAdjust.setBrightness(-0.15);
-            animateScale(0.95, 80);
+            setCacheHint(CacheHint.SPEED);
+            pressTransition.playFromStart();
         });
         setOnMouseReleased(event -> {
-            colorAdjust.setBrightness(isHover() ? 0.10 : 0.0);
-            animateScale(1.0, 100);
+            setCacheHint(CacheHint.SPEED);
+            releaseTransition.playFromStart();
         });
         setOnMouseClicked(event -> event.consume());
     }
 
     public void setActive(boolean active) {
         pseudoClassStateChanged(javafx.css.PseudoClass.getPseudoClass("active"), active);
-    }
-
-    private void animateScale(double scale, double millis) {
-        ScaleTransition transition = new ScaleTransition(Duration.millis(millis), this);
-        transition.setToX(scale);
-        transition.setToY(scale);
-        transition.play();
     }
 
     public enum ButtonRole {
